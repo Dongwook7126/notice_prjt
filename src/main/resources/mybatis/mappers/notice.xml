@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.human.notice.repository.NoticeDAO">
+
+    <!-- ResultMap: DB 컬럼 → NoticeVO 필드 매핑 -->
+    <resultMap id="noticeResultMap" type="com.human.notice.vo.NoticeVO">
+        <id property="n_idx" column="N_IDX" />
+        <result property="n_category" column="N_CATEGORY" />
+        <result property="n_title" column="N_TITLE" />
+        <result property="n_content" column="N_CONTENT" />
+        <result property="n_regdate" column="N_REGDATE" />
+        <result property="n_update" column="N_UPDATE" />
+        <result property="n_status" column="N_STATUS" />
+    </resultMap>
+
+    <!-- 전체 공지사항 조회 -->
+    <select id="selectAllNotices" resultMap="noticeResultMap">
+        <![CDATA[
+            SELECT
+                N_IDX, N_CATEGORY, N_TITLE, N_CONTENT,
+                N_REGDATE, N_UPDATE, N_STATUS
+            FROM TB_NOTICE
+            ORDER BY N_IDX DESC
+        ]]>
+    </select>
+
+    <!-- 공지사항 단건 조회 -->
+    <select id="selectNoticeById" parameterType="int" resultMap="noticeResultMap">
+        <![CDATA[
+            SELECT
+                N_IDX, N_CATEGORY, N_TITLE, N_CONTENT,
+                N_REGDATE, N_UPDATE, N_STATUS
+            FROM TB_NOTICE
+            WHERE N_IDX = #{n_idx}
+        ]]>
+    </select>
+
+    <!-- 새 공지사항 삽입 -->
+    <insert id="insertNotice" parameterType="com.human.notice.vo.NoticeVO">
+        <![CDATA[
+            INSERT INTO TB_NOTICE (
+                N_IDX, N_CATEGORY, N_TITLE, N_CONTENT, N_STATUS
+            ) VALUES (
+                #{n_idx}, #{n_category}, #{n_title}, #{n_content}, #{n_status}
+            )
+        ]]>
+    </insert>
+
+    <!-- 새 글 번호 시퀀스 조회 (Oracle) -->
+    <select id="selectNextNoticeIdx" resultType="int">
+        <![CDATA[
+            SELECT SEQ_NOTICE.NEXTVAL FROM DUAL
+        ]]>
+    </select>
+
+    <!-- 공지사항 수정 -->
+    <update id="updateNotice" parameterType="com.human.notice.vo.NoticeVO">
+        <![CDATA[
+            UPDATE TB_NOTICE
+            SET
+                N_CATEGORY = #{n_category},
+                N_TITLE = #{n_title},
+                N_CONTENT = #{n_content},
+                N_UPDATE = SYSTIMESTAMP,
+                N_STATUS = #{n_status}
+            WHERE N_IDX = #{n_idx}
+        ]]>
+    </update>
+
+    <!-- 공지사항 삭제 -->
+    <delete id="deleteNotice" parameterType="int">
+        <![CDATA[
+            DELETE FROM TB_NOTICE
+            WHERE N_IDX = #{n_idx}
+        ]]>
+    </delete>
+
+</mapper>
